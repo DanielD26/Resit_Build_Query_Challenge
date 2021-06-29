@@ -68,7 +68,7 @@ CREATE TABLE ENROLMENT (
 
 -- SELECT * FROM Subject
 -- SELECT * FROM TEACHER
--- SELECT * FROM STUDENT
+SELECT * FROM STUDENT
 -- SELECT * FROM SUBJECTOFFERING
 -- SELECT * FROM ENROLMENT
 
@@ -109,3 +109,27 @@ INSERT INTO ENROLMENT (StudentID, SubjCode, Year, Semester, Grade, DateEnrolled)
     ('s23344556', 'ICTDBS205', 2019, 2, 'P', '07/01/2019'),
     ('s34455667', 'ICTDBS205', 2019, 2,	'N', '07/13/2019');
 
+-- TASK 4:
+
+-- Query 1:
+SELECT stu.GivenName, stu.Surname, e.SubjCode, sub.Description, e.Year, e.Semester, so.Fee, T.GivenName, T.Surname
+FROM ENROLMENT e 
+INNER JOIN SUBJECTOFFERING so 
+ON e.SubjCode = so.SubjCode AND e.Year = so.Year AND e.Semester = so.Semester
+INNER JOIN TEACHER T 
+ON so.StaffID = T.StaffID
+INNER JOIN STUDENT stu
+ON e.StudentID = stu.StudentID
+INNER JOIN SUBJECT sub
+ON so.SubjCode = sub.SubjCode
+
+-- Query 2:
+SELECT Year, Semester, Count(*) AS 'Num Enrollments'
+FROM ENROLMENT
+GROUP BY Year, Semester
+
+-- Query 3:
+SELECT * FROM ENROLMENT E
+INNER JOIN SUBJECTOFFERING S
+ON E.SubjCode = S.SubjCode AND E.Year = S.Year AND E.Semester = S.Semester
+WHERE S.Fee IN (SELECT MAX(Fee) FROM SUBJECTOFFERING)

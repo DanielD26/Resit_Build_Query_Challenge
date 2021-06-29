@@ -22,7 +22,6 @@ FK (StudentID) REF STUDENT
 */
 
 -- TASK 2:
-
 CREATE TABLE SUBJECT (
     SubjCode    NVARCHAR(100)
    ,Description NVARCHAR(500)
@@ -30,16 +29,16 @@ CREATE TABLE SUBJECT (
 )
 
 CREATE TABLE TEACHER (
-    StaffID     INT CHECK(LEN(StaffID)=8)
-   ,Surname     NVARCHAR(100) NOT NULL
-   ,GivenName   NVARCHAR(100) NOT NULL
+    StaffID             INT CHECK(LEN(StaffID)=8)
+   ,TeacherSurname     NVARCHAR(100) NOT NULL
+   ,TeacherGivenName   NVARCHAR(100) NOT NULL
    ,PRIMARY KEY (StaffID) 
 );
 
 CREATE TABLE STUDENT (
-    StudentID   NVARCHAR(10)
-   ,Surname     NVARCHAR(100) NOT NULL
-   ,GivenName   NVARCHAR(100) NOT NULL
+    StudentID          NVARCHAR(10)
+   ,StudentSurname     NVARCHAR(100) NOT NULL
+   ,StudentGivenName   NVARCHAR(100) NOT NULL
    ,Gender      NVARCHAR(1) CHECK (GENDER IN ('M', 'F', 'I'))
    ,PRIMARY KEY (StudentID)
 )
@@ -78,12 +77,12 @@ INSERT INTO SUBJECT (SubjCode, Description) VALUES
     ('ICTBSB430', 'Create Basic Databases'),
     ('ICTDBS205', 'Design a Database');
 
-INSERT INTO TEACHER (StaffID, Surname, GivenName) VALUES
+INSERT INTO TEACHER (StaffID, TeacherSurname, TeacherGivenName) VALUES
     (98776655, 'Young', 'Angus'),
     (87665544, 'Scott', 'Bon'),
     (76554433, 'Slade', 'Chris');
 
-INSERT INTO STUDENT (StudentID, Surname, GivenName, Gender) VALUES
+INSERT INTO STUDENT (StudentID, StudentSurname, StudentGivenName, Gender) VALUES
     ('s12233445', 'Baird', 'Tim', 'M'),
     ('s23344556', 'Nguyen', 'Anh', 'M'),
     ('s34455667', 'Hallinan', 'James', 'M'),
@@ -112,7 +111,7 @@ INSERT INTO ENROLMENT (StudentID, SubjCode, Year, Semester, Grade, DateEnrolled)
 -- TASK 4:
 
 -- Query 1:
-SELECT stu.GivenName, stu.Surname, e.SubjCode, sub.Description, e.Year, e.Semester, so.Fee, T.GivenName, T.Surname
+SELECT stu.StudentGivenName, stu.StudentSurname, e.SubjCode, sub.Description, e.Year, e.Semester, so.Fee, T.TeacherGivenName, T.TeacherSurname
 FROM ENROLMENT e 
 INNER JOIN SUBJECTOFFERING so 
 ON e.SubjCode = so.SubjCode AND e.Year = so.Year AND e.Semester = so.Semester
@@ -133,3 +132,35 @@ SELECT * FROM ENROLMENT E
 INNER JOIN SUBJECTOFFERING S
 ON E.SubjCode = S.SubjCode AND E.Year = S.Year AND E.Semester = S.Semester
 WHERE S.Fee IN (SELECT MAX(Fee) FROM SUBJECTOFFERING)
+
+-- TASK 5:
+CREATE VIEW DETAILS AS 
+    SELECT stu.StudentGivenName, stu.StudentSurname, e.SubjCode, sub.Description, e.Year, e.Semester, so.Fee, T.TeacherGivenName, T.TeacherSurname
+    FROM ENROLMENT e 
+    INNER JOIN SUBJECTOFFERING so 
+    ON e.SubjCode = so.SubjCode AND e.Year = so.Year AND e.Semester = so.Semester
+    INNER JOIN TEACHER T 
+    ON so.StaffID = T.StaffID
+    INNER JOIN STUDENT stu
+    ON e.StudentID = stu.StudentID
+    INNER JOIN SUBJECT sub
+    ON so.SubjCode = sub.SubjCode
+
+SELECT * FROM DETAILS
+
+-- TASK 6
+-- Task 4 Query 1 Test:
+SELECT COUNT(*) FROM ENROLMENT
+/* Query 1 shows 10 rows. When the test query is ran, it also returns 10. Therefore,
+this verifies that it returns the correct enrolments */
+
+-- Task 4 Query 2 Test:
+SELECT COUNT(*) FROM ENROLMENT
+
+/* Again, as there are 10 enrolments, the query displays the amount of enrolments in each
+year and semseter. When added all together it sums up to 10. 2+4+2+2. */
+
+-- Task 4 Query 3 Test:
+SELECT MAX(Fee) FROM SUBJECTOFFERING
+/* When the test query is ran, it retusn 225. This shows the highest fee in SUBJECTOFFERING.
+The Fee column that is displayed is all 225, therefore displaying the correct resutls. */
